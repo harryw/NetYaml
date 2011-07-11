@@ -12,9 +12,16 @@ namespace NetYaml.ConsoleTest
 		{
 			string yaml =
 @"---
-x: 1
-y: 2";
+x: 
+- a
+- b
+y:
+  f: [g,h]
+  i: jk";
 			var docs = Yaml.Parse(yaml);
+			var doc = docs.First();
+			Console.WriteLine("Key 1: {0}", doc["x"][0]);
+			Console.WriteLine("Key 2: {0}", doc["y"]["f"][0]);
 			Console.WriteLine(docs);
 			Console.ReadLine();
 		}

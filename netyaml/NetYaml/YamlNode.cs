@@ -9,59 +9,139 @@ namespace NetYaml
 	public abstract class YamlNode
 	{
 		public virtual string Tag { get; set; }
-		public abstract void Add(YamlNode child);
-		public virtual bool AllowsChildren { get { return true; } }
+		internal abstract void Add(YamlNode child);
+		internal virtual bool AllowsChildren { get { return true; } }
+
+		protected YamlNode()
+		{
+		}
+		protected YamlNode(string tag)
+		{
+			Tag = tag;
+		}
+
+		public virtual string Scalar 
+		{
+			get { throw new Exception("This YAML node is not a scalar"); }
+			set { throw new Exception("This YAML node is not a scalar"); }
+		}
+		public virtual IList<YamlNode> Sequence { get { throw new Exception("This YAML node is not a sequence"); } }
+		public virtual IDictionary<YamlScalar, YamlNode> Mapping { get { throw new Exception("This YAML node is not a mapping"); } }
+
+		public YamlNode this[int index]
+		{
+			get { return Sequence[index]; }
+			set { Sequence[index] = value; }
+		}
+
+		public YamlNode this[string key]
+		{
+			get { return Mapping[key]; }
+			set { Mapping[key] = value; }
+		}
+
+		public static implicit operator string (YamlNode node)
+		{
+			return node.Scalar;
+		}
 	}
 
-	public class YamlDocument : YamlNode
+	public sealed class YamlDocument : YamlNode
 	{
 		public YamlNode Root { get; set; }
 
-		public override void Add(YamlNode child)
+		internal override void Add(YamlNode child)
 		{
 			Root = child;
 		}
+
+		public override string Scalar
+		{
+			get { return Root.Scalar; }
+			set { Root.Scalar = value; }
+		}
+		public override IList<YamlNode> Sequence { get { return Root.Sequence; } }
+		public override IDictionary<YamlScalar, YamlNode> Mapping { get { return Root.Mapping; } }
 	}
 
-	public class YamlScalar : YamlNode
+	public sealed class YamlScalar : YamlNode
 	{
-		public string Value {get;set;}
+		public override string Scalar { get; set; }
 
-		public override void Add(YamlNode child)
+		public YamlScalar(string value) : this(value, null)
+		{
+		}
+		public YamlScalar(string value, string tag) : base(tag)
+		{
+			Scalar = value;
+		}
+
+		internal override void Add(YamlNode child)
 		{
 			throw new Exception("Cannot add a child to a scalar node");
 		}
-		public override bool AllowsChildren { get { return false; } }
-	}
+		internal override bool AllowsChildren { get { return false; } }
 
-	public class YamlSequence : YamlNode
-	{
-		public IList<YamlNode> Sequence { get; set; }
-
-		public YamlSequence()
+		public static implicit operator YamlScalar(string value)
 		{
-			Sequence = new List<YamlNode>();
+			return new YamlScalar(value);
 		}
 
-		public override void Add(YamlNode child)
+		public override bool Equals(object obj)
+		{
+			var other = obj as YamlScalar;
+			return other != null && string.Equals(Scalar, other.Scalar);
+		}
+
+		public override int GetHashCode()
+		{
+			return Scalar.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return Scalar;
+		}
+	}
+
+	public sealed class YamlSequence : YamlNode
+	{
+		private IList<YamlNode> sequence;
+		public override IList<YamlNode> Sequence { get { return sequence; } }
+
+		public YamlSequence() : this(null)
+		{
+		}
+		public YamlSequence(string tag) : base(tag)
+		{
+			sequence = new List<YamlNode>();
+		}
+
+
+		internal override void Add(YamlNode child)
 		{
 			Sequence.Add(child);
 		}
 	}
 
-	public class YamlMapping : YamlNode
+	public sealed class YamlMapping : YamlNode
 	{
-		public IDictionary<YamlScalar, YamlNode> Mapping { get; set; }
+		private IDictionary<YamlScalar, YamlNode> mapping;
+		public override IDictionary<YamlScalar, YamlNode> Mapping { get { return mapping; } }
 
 		private YamlScalar nextKey;
 
-		public YamlMapping()
+
+		public YamlMapping() : this(null)
 		{
-			Mapping = new Dictionary<YamlScalar, YamlNode>();
+		}
+		public YamlMapping(string tag) : base(tag)
+		{
+			mapping = new Dictionary<YamlScalar, YamlNode>();
 			nextKey = null;
 		}
 
-		public override void Add(YamlNode child)
+		internal override void Add(YamlNode child)
 		{
 			if (nextKey == null)
 			{

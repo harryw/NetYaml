@@ -66,9 +66,8 @@ namespace NetYaml.Interop
 
 		public void Scalar(string anchor, string tag, string value)
 		{
-			var node = new YamlScalar();
+			var node = new YamlScalar(value);
 			node.Tag = tag;
-			node.Value = value;
 			CurrentNode.Add(node);
 			SetAnchor(anchor, node);
 		}
