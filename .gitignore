@@ -1,0 +1,9 @@
+Debug
+Release
+bin
+.user
+.suo
+.vsmdi
+.ncb
+TestResults
+_Resharper*
