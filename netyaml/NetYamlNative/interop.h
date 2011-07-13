@@ -73,7 +73,7 @@ extern "C" {
 
 	NETYAMLNATIVE_DECLARE(int) event_create_alias(
 		yaml_event_t *apEvent, 
-		yaml_char_t *anchor);
+		yaml_char_t *aAnchor);
 
 	NETYAMLNATIVE_DECLARE(void) event_destroy(yaml_event_t *apEvent);
 

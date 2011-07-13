@@ -28,7 +28,11 @@ NETYAMLNATIVE_DECLARE(void) parser_destroy(yaml_parser_t *apParser)
 	}
 }
 
-NETYAMLNATIVE_DECLARE(int) parser_parse(yaml_parser_t *apParser, const unsigned char *aText, size_t aSize, netyamlnative_event_handler_t afpEventHandler)
+NETYAMLNATIVE_DECLARE(int) parser_parse(
+	yaml_parser_t *apParser, 
+	const unsigned char *aText, 
+	size_t aSize, 
+	netyamlnative_event_handler_t afpEventHandler)
 {
 	yaml_parser_set_input_string(apParser, aText, aSize);
 
@@ -49,3 +53,136 @@ NETYAMLNATIVE_DECLARE(int) parser_parse(yaml_parser_t *apParser, const unsigned 
 	return lError;
 }
 
+NETYAMLNATIVE_DECLARE(int) event_create_stream_start(
+	yaml_event_t *apEvent, 
+	yaml_encoding_t aEncoding)
+{
+	return yaml_stream_start_event_initialize(
+		apEvent, 
+		aEncoding);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_stream_end(yaml_event_t *apEvent)
+{
+	return yaml_stream_end_event_initialize(apEvent);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_document_start(
+	yaml_event_t *apEvent, 
+	yaml_version_directive_t *apVersionDirective,
+	yaml_tag_directive_t *apTagDirectivesStart,
+	yaml_tag_directive_t *apTagDirectivesEnd,
+	int aImplicit)
+{
+	return yaml_document_start_event_initialize(
+		apEvent, 
+		apVersionDirective, 
+		apTagDirectivesStart, 
+		apTagDirectivesEnd, 
+		aImplicit);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_document_end(
+	yaml_event_t *apEvent, 
+	int aImplicit)
+{
+	return yaml_document_end_event_initialize(
+		apEvent,
+		aImplicit);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_scalar(
+	yaml_event_t *apEvent, 
+	yaml_char_t *apAnchor, 
+	yaml_char_t *apTag,
+	yaml_char_t *apValue, 
+	int aLength,
+	int aPlainImplicit, 
+	int aQuotedImplicit,
+	yaml_scalar_style_t aStyle)
+{
+	return yaml_scalar_event_initialize(
+		apEvent, 
+		apAnchor, 
+		apTag,
+		apValue, 
+		aLength,
+		aPlainImplicit, 
+		aQuotedImplicit,
+		aStyle);
+}
+
+
+NETYAMLNATIVE_DECLARE(int) event_create_sequence_start(
+	yaml_event_t *apEvent,
+	yaml_char_t *apAnchor, 
+	yaml_char_t *apTag, 
+	int aImplicit,
+	yaml_sequence_style_t aStyle)
+{
+	return yaml_sequence_start_event_initialize(
+		apEvent,
+		apAnchor, 
+		apTag, 
+		aImplicit,
+		aStyle);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_sequence_end(yaml_event_t *apEvent)
+{
+	return yaml_sequence_end_event_initialize(apEvent);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_mapping_start(
+	yaml_event_t *apEvent, 
+	yaml_char_t *apAnchor, 
+	yaml_char_t *apTag, 
+	int aImplicit,
+	yaml_mapping_style_t aStyle)
+{
+	return yaml_mapping_start_event_initialize(
+		apEvent, 
+		apAnchor, 
+		apTag, 
+		aImplicit,
+		aStyle);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_mapping_end(yaml_event_t *apEvent)
+{
+	return yaml_mapping_end_event_initialize(apEvent);
+}
+
+NETYAMLNATIVE_DECLARE(int) event_create_alias(
+	yaml_event_t *apEvent, 
+	yaml_char_t *aAnchor)
+{
+	return yaml_alias_event_initialize(
+		apEvent, 
+		aAnchor);
+}
+
+NETYAMLNATIVE_DECLARE(void) event_destroy(yaml_event_t *apEvent)
+{
+	return yaml_event_delete(apEvent);
+}
+
+NETYAMLNATIVE_DECLARE(int) emitter_create(yaml_emitter_t **appEmitter)
+{
+	return yaml_emitter_initialize(*appEmitter);
+}
+
+NETYAMLNATIVE_DECLARE(void) emitter_destroy(yaml_emitter_t *apEmitter)
+{
+	yaml_emitter_close(apEmitter);
+	yaml_emitter_delete(apEmitter);
+}
+
+NETYAMLNATIVE_DECLARE(int) emitter_emit(
+	yaml_emitter_t *apEmitter, 
+	yaml_event_t *apEvent, 
+	yaml_write_handler_t afpWriteHandler)
+{
+	yaml_emitter_set_output(apEmitter, afpWriteHandler, apEmitter);
+	return yaml_emitter_emit(apEmitter, apEvent);
+}
