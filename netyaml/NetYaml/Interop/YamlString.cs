@@ -15,5 +15,10 @@ namespace NetYaml.Interop
 		{
 			return Marshal.PtrToStringAnsi(yamlString.value);
 		}
+
+		public static implicit operator YamlString(string dotNetString)
+		{
+			return new YamlString { @value = Marshal.StringToHGlobalAnsi(dotNetString) };
+		}
 	}
 }

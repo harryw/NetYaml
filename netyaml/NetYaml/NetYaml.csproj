@@ -47,14 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interop\NativeEmitter.cs" />
     <Compile Include="Interop\YamlBuilder.cs" />
     <Compile Include="Interop\Size.cs" />
-    <Compile Include="Interop\YamlChar.cs" />
+    <Compile Include="Interop\YamlString.cs" />
     <Compile Include="Interop\YamlTagDirectives.cs" />
     <Compile Include="Interop\YamlTagDirective.cs" />
     <Compile Include="Interop\YamlEnumerations.cs" />
     <Compile Include="Interop\YamlEvent.cs" />
     <Compile Include="Interop\YamlVersionDirective.cs" />
+    <Compile Include="Interop\YamlWriter.cs" />
     <Compile Include="Yaml.cs" />
     <Compile Include="YamlNode.cs" />
     <Compile Include="Interop\NativeParser.cs" />

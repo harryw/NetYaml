@@ -11,6 +11,7 @@ namespace NetYaml
 		public virtual string Tag { get; set; }
 		internal abstract void Add(YamlNode child);
 		internal virtual bool AllowsChildren { get { return true; } }
+		internal abstract IEnumerable<YamlNode> SubNodes { get; }
 
 		protected YamlNode()
 		{
@@ -54,6 +55,10 @@ namespace NetYaml
 		{
 			Root = child;
 		}
+		internal override IEnumerable<YamlNode> SubNodes
+		{
+			get { yield return Root; }
+		}
 
 		public override string Scalar
 		{
@@ -81,6 +86,10 @@ namespace NetYaml
 			throw new Exception("Cannot add a child to a scalar node");
 		}
 		internal override bool AllowsChildren { get { return false; } }
+		internal override IEnumerable<YamlNode> SubNodes
+		{
+			get { return Enumerable.Empty<YamlNode>(); }
+		}
 
 		public static implicit operator YamlScalar(string value)
 		{
@@ -117,10 +126,13 @@ namespace NetYaml
 			sequence = new List<YamlNode>();
 		}
 
-
 		internal override void Add(YamlNode child)
 		{
 			Sequence.Add(child);
+		}
+		internal override IEnumerable<YamlNode> SubNodes
+		{
+			get { return Sequence; }
 		}
 	}
 
@@ -157,6 +169,10 @@ namespace NetYaml
 				Mapping.Add(nextKey, child);
 				nextKey = null;
 			}
+		}
+		internal override IEnumerable<YamlNode> SubNodes
+		{
+			get { return Mapping.SelectMany(x => new List<YamlNode>{x.Key, x.Value}); }
 		}
 	}
 }

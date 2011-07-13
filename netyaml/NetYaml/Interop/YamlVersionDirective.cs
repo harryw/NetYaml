@@ -9,9 +9,15 @@ namespace NetYaml.Interop
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct YamlVersionDirective
 	{
+		internal YamlVersionDirective(int majorVersion, int minorVersion)
+		{
+			major = majorVersion;
+			minor = minorVersion;
+		}
+
 		/** The major version number. */
-		int major;
+		internal int major;
 		/** The minor version number. */
-		int minor;
+		internal int minor;
 	}
 }
