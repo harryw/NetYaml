@@ -10,6 +10,27 @@ namespace NetYaml.ConsoleTest
 	{
 		static void Main(string[] args)
 		{
+			var doc = new YamlDocument();
+			var xyMapping = doc.Root = new YamlMapping();
+			var abSequence = xyMapping["x"] = new YamlSequence();
+			abSequence.Sequence.Add(new YamlScalar("a"));
+			abSequence.Sequence.Add(new YamlScalar("b"));
+			var fiMapping = xyMapping["y"] = new YamlMapping();
+			var ghSequence = fiMapping["f"] = new YamlSequence();
+			ghSequence.Sequence.Add(new YamlScalar("g"));
+			ghSequence.Sequence.Add(new YamlScalar("h"));
+			fiMapping["i"] = new YamlScalar("jk");
+			string yaml = Yaml.Dump(doc);
+			Console.WriteLine(yaml);
+			Console.ReadLine();
+		}
+
+		static void EmitTest()
+		{
+		}
+
+		static void ParseTest()
+		{
 			string yaml =
 @"---
 x: 

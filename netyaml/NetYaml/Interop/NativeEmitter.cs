@@ -17,11 +17,11 @@ namespace NetYaml
 				emitters = new Dictionary<IntPtr, YamlWriter>();
 			}
 
-			internal static string Dump(IList<YamlDocument> documents)
+			internal static unsafe string Dump(IList<YamlDocument> documents)
 			{
 				IntPtr pNativeEmitter;
 				var writer = new YamlWriter();
-				if (1 != CreateEmitter(&pNativeEmitter))
+				if (1 != CreateEmitter(&pNativeEmitter, WriteYamlContent))
 				{
 					throw new Exception("Failed to create a native emitter");
 				}
@@ -165,7 +165,7 @@ namespace NetYaml
 				}
 				try
 				{
-					Emit(pNativeEmitter, &@event, WriteYamlContent);
+					Emit(pNativeEmitter, &@event);
 				}
 				finally
 				{
@@ -201,7 +201,9 @@ namespace NetYaml
 				int size);
 
 			[DllImport("NetYamlNative", EntryPoint = "emitter_create", CallingConvention = CallingConvention.Cdecl)]
-			private static extern int CreateEmitter(IntPtr* pNativeEmitter);
+			private static extern int CreateEmitter(
+				IntPtr* pNativeEmitter,
+				YamlWriteHandler writeHandler);
 
 			[DllImport("NetYamlNative", EntryPoint = "emitter_destroy", CallingConvention = CallingConvention.Cdecl)]
 			private static extern void DestroyEmitter(IntPtr pNativeEmitter);
@@ -209,8 +211,7 @@ namespace NetYaml
 			[DllImport("NetYamlNative", EntryPoint = "emitter_emit", CallingConvention = CallingConvention.Cdecl)]
 			private static extern int Emit(
 				IntPtr pNativeEmitter, 
-				YamlEvent *pEvent, 
-				YamlWriteHandler writeHandler);
+				YamlEvent *pEvent);
 
 			[DllImport("NetYamlNative", EntryPoint = "event_create_stream_start", CallingConvention = CallingConvention.Cdecl)]
 			private static extern int CreateEventStreamStart(

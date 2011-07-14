@@ -77,14 +77,15 @@ extern "C" {
 
 	NETYAMLNATIVE_DECLARE(void) event_destroy(yaml_event_t *apEvent);
 
-	NETYAMLNATIVE_DECLARE(int) emitter_create(yaml_emitter_t **appEmitter);
+	NETYAMLNATIVE_DECLARE(int) emitter_create(
+		yaml_emitter_t **appEmitter,
+		yaml_write_handler_t afpWriteHandler);
 
 	NETYAMLNATIVE_DECLARE(void) emitter_destroy(yaml_emitter_t *apEmitter);
 
 	NETYAMLNATIVE_DECLARE(int) emitter_emit(
 		yaml_emitter_t *apEmitter, 
-		yaml_event_t *apEvent, 
-		yaml_write_handler_t afpWriteHandler);
+		yaml_event_t *apEvent);
 
 
 #ifdef __cplusplus

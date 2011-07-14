@@ -22,6 +22,8 @@ NETYAMLNATIVE_DECLARE(int) parser_create(yaml_parser_t **appParser)
 
 NETYAMLNATIVE_DECLARE(void) parser_destroy(yaml_parser_t *apParser)
 {
+	yaml_parser_delete(apParser);
+
 	if (NULL != apParser)
 	{
 		free(apParser);
@@ -167,22 +169,37 @@ NETYAMLNATIVE_DECLARE(void) event_destroy(yaml_event_t *apEvent)
 	return yaml_event_delete(apEvent);
 }
 
-NETYAMLNATIVE_DECLARE(int) emitter_create(yaml_emitter_t **appEmitter)
+NETYAMLNATIVE_DECLARE(int) emitter_create(
+	yaml_emitter_t **appEmitter,
+	yaml_write_handler_t afpWriteHandler)
 {
-	return yaml_emitter_initialize(*appEmitter);
+	int lSuccess = FALSE;
+	*appEmitter = (yaml_emitter_t*)malloc(sizeof(yaml_emitter_t));
+	if (NULL != *appEmitter)
+	{
+		lSuccess = yaml_emitter_initialize(*appEmitter);
+	}
+	if (lSuccess)
+	{
+		yaml_emitter_set_output(*appEmitter, afpWriteHandler, *appEmitter);
+	}
+	return lSuccess;
 }
 
 NETYAMLNATIVE_DECLARE(void) emitter_destroy(yaml_emitter_t *apEmitter)
 {
-	yaml_emitter_close(apEmitter);
+	yaml_emitter_flush(apEmitter);
 	yaml_emitter_delete(apEmitter);
+
+	if (NULL != apEmitter)
+	{
+		free(apEmitter);
+	}
 }
 
 NETYAMLNATIVE_DECLARE(int) emitter_emit(
 	yaml_emitter_t *apEmitter, 
-	yaml_event_t *apEvent, 
-	yaml_write_handler_t afpWriteHandler)
+	yaml_event_t *apEvent)
 {
-	yaml_emitter_set_output(apEmitter, afpWriteHandler, apEmitter);
 	return yaml_emitter_emit(apEmitter, apEvent);
 }

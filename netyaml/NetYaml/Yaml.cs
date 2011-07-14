@@ -15,5 +15,15 @@ namespace NetYaml
 			NativeParser.Parse(yaml, out docs);
 			return docs;
 		}
+
+		public static string Dump(IList<YamlDocument> docs)
+		{
+			return NativeEmitter.Dump(docs);
+		}
+
+		public static string Dump(YamlDocument doc)
+		{
+			return Dump(new List<YamlDocument> { doc });
+		}
 	}
 }
