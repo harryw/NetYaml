@@ -20,16 +20,16 @@ namespace NetYaml.ConsoleTest
 		private static void AliasTest()
 		{
 			var repeatNode = new YMapping(new Dictionary<YScalar, YNode> {
-							{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
-							{"i", new YScalar("jk")}
-						});
+				{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
+				{"i", new YScalar("jk")}
+			});
 			var doc = new YDocument(
 				new YMapping(new Dictionary<YScalar, YNode> {
-						{"x", new YSequence(new YScalar("a"), new YScalar("b"), repeatNode)},
-						{"y", repeatNode},
-						{"z", repeatNode}
-					})
-				);
+					{"x", new YSequence(new YScalar("a"), new YScalar("b"), repeatNode)},
+					{"y", repeatNode},
+					{"z", repeatNode}
+				})
+			);
 			string yaml = Yaml.Dump(doc);
 			Console.WriteLine(yaml);
 		}
@@ -38,13 +38,13 @@ namespace NetYaml.ConsoleTest
 		{
 			doc = doc ?? new YDocument(
 				new YMapping(new Dictionary<YScalar, YNode> {
-						{"x", new YSequence(new YScalar("a"), new YScalar("b"))},
-						{"y", new YMapping(new Dictionary<YScalar, YNode> {
-							{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
-							{"i", new YScalar("jk")}
-						})},
-					})
-				);
+					{"x", new YSequence(new YScalar("a"), new YScalar("b"))},
+					{"y", new YMapping(new Dictionary<YScalar, YNode> {
+						{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
+						{"i", new YScalar("jk")}
+					})},
+				})
+			);
 			string yaml = Yaml.Dump(doc);
 			Console.WriteLine(yaml);
 		}

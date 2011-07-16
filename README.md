@@ -4,7 +4,9 @@ NetYaml is a .Net library providing managed bindings for the LibYAML native YAML
 
 ## Usage
 
-The API is intended to be unobtrusive and loosely-typed.  For example:
+The API is intended to be unobtrusive and loosely-typed.  
+
+Example Yaml.Parse usage:
 
 ```C#
 string yaml =
@@ -20,6 +22,21 @@ var doc = Yaml.Parse(yaml).First();
 Console.WriteLine(doc["y"]["f"][0]); // prints 'g'
 ```
 
+Example Yaml.Dump usage:
+
+```c#
+var doc = new YDocument(
+  new YMapping(new Dictionary<YScalar, YNode> {
+    {"x", new YSequence(new YScalar("a"), new YScalar("b"))},
+    {"y", new YMapping(new Dictionary<YScalar, YNode> {
+      {"f", new YSequence(new YScalar("g"), new YScalar("h"))},
+      {"i", new YScalar("jk")}
+    })},
+  })
+);
+string yaml = Yaml.Dump(doc);
+Console.WriteLine(yaml); // prints the YAML from the above parse example
+```
 
 ## Copyright
 
