@@ -10,7 +10,15 @@ namespace NetYaml.ConsoleTest
 	{
 		static void Main(string[] args)
 		{
-			var doc = new YDocument(
+			var doc = ParseTest();
+			EmitTest(doc);
+			EmitTest(null);
+			Console.ReadLine();
+		}
+
+		static void EmitTest(YDocument doc)
+		{
+			doc = doc ?? new YDocument(
 				new YMapping(new Dictionary<YScalar, YNode> {
 						{"x", new YSequence(new YScalar("a"), new YScalar("b"))},
 						{"y", new YMapping(new Dictionary<YScalar, YNode> {
@@ -19,25 +27,11 @@ namespace NetYaml.ConsoleTest
 						})}
 					})
 				);
-			//var xyMapping = doc.Root = new YMapping();
-			//var abSequence = xyMapping["x"] = new YSequence();
-			//abSequence.Sequence.Add(new YScalar("a"));
-			//abSequence.Sequence.Add(new YScalar("b"));
-			//var fiMapping = xyMapping["y"] = new YMapping();
-			//var ghSequence = fiMapping["f"] = new YSequence();
-			//ghSequence.Sequence.Add(new YScalar("g"));
-			//ghSequence.Sequence.Add(new YScalar("h"));
-			//fiMapping["i"] = new YScalar("jk");
 			string yaml = Yaml.Dump(doc);
 			Console.WriteLine(yaml);
-			Console.ReadLine();
 		}
 
-		static void EmitTest()
-		{
-		}
-
-		static void ParseTest()
+		static YDocument ParseTest()
 		{
 			string yaml =
 @"---
@@ -52,7 +46,7 @@ y:
 			Console.WriteLine("Key 1: {0}", doc["x"][0]);
 			Console.WriteLine("Key 2: {0}", doc["y"]["f"][0]);
 			Console.WriteLine(docs);
-			Console.ReadLine();
+			return doc;
 		}
 	}
 }

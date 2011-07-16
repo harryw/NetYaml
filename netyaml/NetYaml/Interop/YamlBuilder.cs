@@ -66,16 +66,14 @@ namespace NetYaml.Interop
 
 		public void Scalar(string anchor, string tag, string value)
 		{
-			var node = new YScalar(value);
-			node.Tag = new YTag(tag);
+			var node = new YScalar(new YTag(tag), value);
 			CurrentNode.Add(node);
 			SetAnchor(anchor, node);
 		}
 
 		public void SequenceStart(string anchor, string tag)
 		{
-			var node = new YSequence();
-			node.Tag = new YTag(tag);
+			var node = new YSequence(new YTag(tag));
 			CurrentNode.Add(node);
 			nodeStack.Push(node);
 			SetAnchor(anchor, node);
@@ -88,8 +86,7 @@ namespace NetYaml.Interop
 
 		public void MappingStart(string anchor, string tag)
 		{
-			var node = new YMapping();
-			node.Tag = new YTag(tag);
+			var node = new YMapping(new YTag(tag));
 			CurrentNode.Add(node);
 			nodeStack.Push(node);
 			SetAnchor(anchor, node);
