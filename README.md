@@ -8,7 +8,7 @@ The API is intended to be unobtrusive and loosely-typed.
 
 Example Yaml.Parse usage:
 
-```C#
+```c#
 string yaml =
 @"---
 x: 
