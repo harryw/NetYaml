@@ -10,22 +10,30 @@ namespace NetYaml.ConsoleTest
 	{
 		static void Main(string[] args)
 		{
-			var doc = ParseTest();
-			EmitTest(doc);
-			EmitTest(null);
+			//var doc = ParseTest();
+			//EmitTest(doc);
+			//EmitTest(null);
+			AliasTest();
 			Console.ReadLine();
+		}
+
+		private static void AliasTest()
+		{
+			var repeatNode = new YScalar("dup");
+			var doc = new YDocument(new YSequence(repeatNode, repeatNode));
+			string yaml = Yaml.Dump(doc);
+			Console.WriteLine(yaml);
 		}
 
 		static void EmitTest(YDocument doc)
 		{
-			var repeatNode = new YMapping(new Dictionary<YScalar, YNode> {
-							{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
-							{"i", new YScalar("jk")}});
 			doc = doc ?? new YDocument(
 				new YMapping(new Dictionary<YScalar, YNode> {
 						{"x", new YSequence(new YScalar("a"), new YScalar("b"))},
-						{"y", repeatNode},
-						{"z", repeatNode}
+						{"y", new YMapping(new Dictionary<YScalar, YNode> {
+							{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
+							{"i", new YScalar("jk")}
+						})},
 					})
 				);
 			string yaml = Yaml.Dump(doc);

@@ -99,10 +99,7 @@ namespace NetYaml
 
 				if (isAlias)
 				{
-					if (!visited.Contains(node))
-					{
-						GenerateEvent(pNativeEmitter, x => CreateEventAlias((YamlEvent*)x, alias));
-					}
+					GenerateEvent(pNativeEmitter, x => CreateEventAlias((YamlEvent*)x, alias));
 				}
 				else
 				{
