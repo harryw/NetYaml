@@ -17,7 +17,7 @@ namespace NetYaml
 				emitters = new Dictionary<IntPtr, YamlWriter>();
 			}
 
-			internal static unsafe string Dump(IList<YamlDocument> documents)
+			internal static unsafe string Dump(IList<YDocument> documents)
 			{
 				IntPtr pNativeEmitter;
 				var writer = new YamlWriter();
@@ -38,7 +38,7 @@ namespace NetYaml
 				return writer.Builder.ToString();
 			}
 
-			private static void GenerateEvents(IntPtr pNativeEmitter, IList<YamlDocument> documents)
+			private static void GenerateEvents(IntPtr pNativeEmitter, IList<YDocument> documents)
 			{
 				GenerateEvent(pNativeEmitter, x => CreateEventStreamStart((YamlEvent*)x, YamlEncoding.YAML_ANY_ENCODING));
 				foreach (var document in documents)
@@ -47,8 +47,8 @@ namespace NetYaml
 					YamlTagDirective *NO_TAG_DIRECTIVE = null;
 					const int DOCUMENT_START_EXPLICIT = 0;
 					GenerateEvent(pNativeEmitter, x => CreateEventDocumentStart((YamlEvent*)x, NO_VERSION_DIRECTIVE, NO_TAG_DIRECTIVE, NO_TAG_DIRECTIVE, DOCUMENT_START_EXPLICIT));
-					var visited = new HashSet<YamlNode>();
-					var duplicates= new HashSet<YamlNode>();
+					var visited = new HashSet<YNode>();
+					var duplicates= new HashSet<YNode>();
 					FindDuplicateNodes(document, visited, duplicates);
 					var aliases = GenerateAliases(duplicates);
 					visited.Clear();
@@ -59,9 +59,9 @@ namespace NetYaml
 				GenerateEvent(pNativeEmitter, x => CreateEventStreamEnd((YamlEvent*)x));
 			}
 
-			private static IDictionary<YamlNode, string> GenerateAliases(HashSet<YamlNode> duplicateNodes)
+			private static IDictionary<YNode, string> GenerateAliases(HashSet<YNode> duplicateNodes)
 			{
-				var aliases = new Dictionary<YamlNode, string>();
+				var aliases = new Dictionary<YNode, string>();
 				int count = 0;
 				foreach (var node in duplicateNodes)
 				{
@@ -70,7 +70,7 @@ namespace NetYaml
 				return aliases;
 			}
 
-			private static void FindDuplicateNodes(YamlNode node, HashSet<YamlNode> visited, HashSet<YamlNode> duplicates)
+			private static void FindDuplicateNodes(YNode node, HashSet<YNode> visited, HashSet<YNode> duplicates)
 			{
 				if (visited.Contains(node))
 				{
@@ -86,7 +86,7 @@ namespace NetYaml
 				}
 			}
 
-			private static void GenerateNodeEvents(IntPtr pNativeEmitter, YamlNode node, IDictionary<YamlNode, string> aliases, HashSet<YamlNode> visited)
+			private static void GenerateNodeEvents(IntPtr pNativeEmitter, YNode node, IDictionary<YNode, string> aliases, HashSet<YNode> visited)
 			{
 				string alias;
 				bool hasAlias = aliases.TryGetValue(node, out alias);
@@ -107,9 +107,9 @@ namespace NetYaml
 				else
 				{
 					string anchor = isAnchor ? alias : null;
-					var scalarNode = node as YamlScalar;
-					var sequenceNode = node as YamlSequence;
-					var mappingNode = node as YamlMapping;
+					var scalarNode = node as YScalar;
+					var sequenceNode = node as YSequence;
+					var mappingNode = node as YMapping;
 					if (scalarNode != null)
 					{
 						GenerateSubTypeEvents(pNativeEmitter, scalarNode, aliases, anchor);
@@ -125,17 +125,17 @@ namespace NetYaml
 				}
 			}
 
-			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YamlScalar node, IDictionary<YamlNode, string> aliases, string anchor)
+			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YScalar node, IDictionary<YNode, string> aliases, string anchor)
 			{
 				const int PLAIN_IMPLICIT = 1;
 				const int QUOTED_IMPLICIT = 1;
-				GenerateEvent(pNativeEmitter, x => CreateEventScalar((YamlEvent*)x, anchor, node.Tag, node.Scalar, node.Scalar.Length, PLAIN_IMPLICIT, QUOTED_IMPLICIT, YamlScalarStyle.YAML_ANY_SCALAR_STYLE));
+				GenerateEvent(pNativeEmitter, x => CreateEventScalar((YamlEvent*)x, anchor, node.Tag.Value, node.Scalar, node.Scalar.Length, PLAIN_IMPLICIT, QUOTED_IMPLICIT, YamlScalarStyle.YAML_ANY_SCALAR_STYLE));
 			}
 
-			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YamlSequence node, IDictionary<YamlNode, string> aliases, string anchor, HashSet<YamlNode> visited)
+			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YSequence node, IDictionary<YNode, string> aliases, string anchor, HashSet<YNode> visited)
 			{
 				const int IMPLICIT = 1;
-				GenerateEvent(pNativeEmitter, x => CreateEventSequenceStart((YamlEvent*)x, anchor, node.Tag, IMPLICIT, YamlSequenceStyle.YAML_ANY_SEQUENCE_STYLE));
+				GenerateEvent(pNativeEmitter, x => CreateEventSequenceStart((YamlEvent*)x, anchor, node.Tag.Value, IMPLICIT, YamlSequenceStyle.YAML_ANY_SEQUENCE_STYLE));
 				foreach (var item in node.Sequence)
 				{
 					GenerateNodeEvents(pNativeEmitter, item, aliases, visited);
@@ -143,10 +143,10 @@ namespace NetYaml
 				GenerateEvent(pNativeEmitter, x => CreateEventSequenceEnd((YamlEvent*)x));
 			}
 
-			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YamlMapping node, IDictionary<YamlNode, string> aliases, string anchor, HashSet<YamlNode> visited)
+			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YMapping node, IDictionary<YNode, string> aliases, string anchor, HashSet<YNode> visited)
 			{
 				const int IMPLICIT = 1;
-				GenerateEvent(pNativeEmitter, x => CreateEventMappingStart((YamlEvent*)x, anchor, node.Tag, IMPLICIT, YamlMappingStyle.YAML_ANY_MAPPING_STYLE));
+				GenerateEvent(pNativeEmitter, x => CreateEventMappingStart((YamlEvent*)x, anchor, node.Tag.Value, IMPLICIT, YamlMappingStyle.YAML_ANY_MAPPING_STYLE));
 				foreach (var pair in node.Mapping)
 				{
 					GenerateNodeEvents(pNativeEmitter, pair.Key, aliases, visited);

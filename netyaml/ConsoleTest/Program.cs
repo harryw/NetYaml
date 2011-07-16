@@ -10,16 +10,24 @@ namespace NetYaml.ConsoleTest
 	{
 		static void Main(string[] args)
 		{
-			var doc = new YamlDocument();
-			var xyMapping = doc.Root = new YamlMapping();
-			var abSequence = xyMapping["x"] = new YamlSequence();
-			abSequence.Sequence.Add(new YamlScalar("a"));
-			abSequence.Sequence.Add(new YamlScalar("b"));
-			var fiMapping = xyMapping["y"] = new YamlMapping();
-			var ghSequence = fiMapping["f"] = new YamlSequence();
-			ghSequence.Sequence.Add(new YamlScalar("g"));
-			ghSequence.Sequence.Add(new YamlScalar("h"));
-			fiMapping["i"] = new YamlScalar("jk");
+			var doc = new YDocument(
+				new YMapping(new Dictionary<YScalar, YNode> {
+						{"x", new YSequence(new YScalar("a"), new YScalar("b"))},
+						{"y", new YMapping(new Dictionary<YScalar, YNode> {
+							{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
+							{"i", new YScalar("jk")}
+						})}
+					})
+				);
+			//var xyMapping = doc.Root = new YMapping();
+			//var abSequence = xyMapping["x"] = new YSequence();
+			//abSequence.Sequence.Add(new YScalar("a"));
+			//abSequence.Sequence.Add(new YScalar("b"));
+			//var fiMapping = xyMapping["y"] = new YMapping();
+			//var ghSequence = fiMapping["f"] = new YSequence();
+			//ghSequence.Sequence.Add(new YScalar("g"));
+			//ghSequence.Sequence.Add(new YScalar("h"));
+			//fiMapping["i"] = new YScalar("jk");
 			string yaml = Yaml.Dump(doc);
 			Console.WriteLine(yaml);
 			Console.ReadLine();

@@ -7,24 +7,24 @@ namespace NetYaml.Interop
 {
 	public class YamlBuilder
 	{
-		public IList<YamlDocument> Documents { get; private set; }
+		public IList<YDocument> Documents { get; private set; }
 
-		private Dictionary<string, YamlNode> anchors;
-		private Stack<YamlNode> nodeStack;
+		private Dictionary<string, YNode> anchors;
+		private Stack<YNode> nodeStack;
 
 		public YamlBuilder()
 		{
-			Documents = new List<YamlDocument>();
-			nodeStack = new Stack<YamlNode>();
+			Documents = new List<YDocument>();
+			nodeStack = new Stack<YNode>();
 		}
 
-		private void SetAnchor(string anchor, YamlNode node)
+		private void SetAnchor(string anchor, YNode node)
 		{
 			if (!string.IsNullOrEmpty(anchor))
 				anchors[anchor] = node;
 		}
 
-		private YamlNode CurrentNode
+		private YNode CurrentNode
 		{
 			get
 			{
@@ -39,21 +39,21 @@ namespace NetYaml.Interop
 
 		public void StreamEnd()
 		{
-			if (CurrentNode != null && !(CurrentNode is YamlDocument))
+			if (CurrentNode != null && !(CurrentNode is YDocument))
 				throw new Exception("Stream ended before document ended");
 		}
 
 		public void DocumentStart()
 		{
-			var doc = new YamlDocument();
+			var doc = new YDocument();
 			Documents.Add(doc);
 			nodeStack.Push(doc);
-			anchors = new Dictionary<string, YamlNode>();
+			anchors = new Dictionary<string, YNode>();
 		}
 
 		public void DocumentEnd()
 		{
-			if (!(CurrentNode is YamlDocument))
+			if (!(CurrentNode is YDocument))
 				throw new Exception("Document ended unexpectedly");
 			nodeStack.Pop();
 		}
@@ -66,16 +66,16 @@ namespace NetYaml.Interop
 
 		public void Scalar(string anchor, string tag, string value)
 		{
-			var node = new YamlScalar(value);
-			node.Tag = tag;
+			var node = new YScalar(value);
+			node.Tag = new YTag(tag);
 			CurrentNode.Add(node);
 			SetAnchor(anchor, node);
 		}
 
 		public void SequenceStart(string anchor, string tag)
 		{
-			var node = new YamlSequence();
-			node.Tag = tag;
+			var node = new YSequence();
+			node.Tag = new YTag(tag);
 			CurrentNode.Add(node);
 			nodeStack.Push(node);
 			SetAnchor(anchor, node);
@@ -88,8 +88,8 @@ namespace NetYaml.Interop
 
 		public void MappingStart(string anchor, string tag)
 		{
-			var node = new YamlMapping();
-			node.Tag = tag;
+			var node = new YMapping();
+			node.Tag = new YTag(tag);
 			CurrentNode.Add(node);
 			nodeStack.Push(node);
 			SetAnchor(anchor, node);

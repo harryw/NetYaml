@@ -9,21 +9,21 @@ namespace NetYaml
 {
 	public static class Yaml
 	{
-		public static IList<YamlDocument> Parse(string yaml)
+		public static IList<YDocument> Parse(string yaml)
 		{
-			IList<YamlDocument> docs;
+			IList<YDocument> docs;
 			NativeParser.Parse(yaml, out docs);
 			return docs;
 		}
 
-		public static string Dump(IList<YamlDocument> docs)
+		public static string Dump(IList<YDocument> docs)
 		{
 			return NativeEmitter.Dump(docs);
 		}
 
-		public static string Dump(YamlDocument doc)
+		public static string Dump(YDocument doc)
 		{
-			return Dump(new List<YamlDocument> { doc });
+			return Dump(new List<YDocument> { doc });
 		}
 	}
 }

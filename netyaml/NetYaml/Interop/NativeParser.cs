@@ -17,7 +17,7 @@ namespace NetYaml
 				parsers = new Dictionary<IntPtr, YamlBuilder>();
 			}
 
-			internal static void Parse(string text, out IList<YamlDocument> documents)
+			internal static void Parse(string text, out IList<YDocument> documents)
 			{
 				IntPtr pNativeParser;
 				var builder = new YamlBuilder();
