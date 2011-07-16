@@ -166,7 +166,7 @@ NETYAMLNATIVE_DECLARE(int) event_create_alias(
 
 NETYAMLNATIVE_DECLARE(void) event_destroy(yaml_event_t *apEvent)
 {
-	return yaml_event_delete(apEvent);
+//	yaml_event_delete(apEvent);
 }
 
 NETYAMLNATIVE_DECLARE(int) emitter_create(

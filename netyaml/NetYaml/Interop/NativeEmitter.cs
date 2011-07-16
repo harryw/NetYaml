@@ -40,13 +40,13 @@ namespace NetYaml
 
 			private static void GenerateEvents(IntPtr pNativeEmitter, IList<YamlDocument> documents)
 			{
-				GenerateEvent(pNativeEmitter, x => CreateEventStreamStart(&x, YamlEncoding.YAML_ANY_ENCODING));
+				GenerateEvent(pNativeEmitter, x => CreateEventStreamStart((YamlEvent*)x, YamlEncoding.YAML_ANY_ENCODING));
 				foreach (var document in documents)
 				{
 					YamlVersionDirective *NO_VERSION_DIRECTIVE = null;
 					YamlTagDirective *NO_TAG_DIRECTIVE = null;
 					const int DOCUMENT_START_EXPLICIT = 0;
-					GenerateEvent(pNativeEmitter, x => CreateEventDocumentStart(&x, NO_VERSION_DIRECTIVE, NO_TAG_DIRECTIVE, NO_TAG_DIRECTIVE, DOCUMENT_START_EXPLICIT));
+					GenerateEvent(pNativeEmitter, x => CreateEventDocumentStart((YamlEvent*)x, NO_VERSION_DIRECTIVE, NO_TAG_DIRECTIVE, NO_TAG_DIRECTIVE, DOCUMENT_START_EXPLICIT));
 					var visited = new HashSet<YamlNode>();
 					var duplicates= new HashSet<YamlNode>();
 					FindDuplicateNodes(document, visited, duplicates);
@@ -54,9 +54,9 @@ namespace NetYaml
 					visited.Clear();
 					GenerateNodeEvents(pNativeEmitter, document.Root, aliases, visited);
 					const int DOCUMENT_END_IMPLICIT = 1;
-					GenerateEvent(pNativeEmitter, x => CreateEventDocumentEnd(&x, DOCUMENT_END_IMPLICIT));
+					GenerateEvent(pNativeEmitter, x => CreateEventDocumentEnd((YamlEvent*)x, DOCUMENT_END_IMPLICIT));
 				}
-				GenerateEvent(pNativeEmitter, x => CreateEventStreamEnd(&x));
+				GenerateEvent(pNativeEmitter, x => CreateEventStreamEnd((YamlEvent*)x));
 			}
 
 			private static IDictionary<YamlNode, string> GenerateAliases(HashSet<YamlNode> duplicateNodes)
@@ -101,7 +101,7 @@ namespace NetYaml
 				{
 					if (!visited.Contains(node))
 					{
-						GenerateEvent(pNativeEmitter, x => CreateEventAlias(&x, alias));
+						GenerateEvent(pNativeEmitter, x => CreateEventAlias((YamlEvent*)x, alias));
 					}
 				}
 				else
@@ -129,47 +129,49 @@ namespace NetYaml
 			{
 				const int PLAIN_IMPLICIT = 1;
 				const int QUOTED_IMPLICIT = 1;
-				GenerateEvent(pNativeEmitter, x => CreateEventScalar(&x, anchor, node.Tag, node.Scalar, node.Scalar.Length, PLAIN_IMPLICIT, QUOTED_IMPLICIT, YamlScalarStyle.YAML_ANY_SCALAR_STYLE));
+				GenerateEvent(pNativeEmitter, x => CreateEventScalar((YamlEvent*)x, anchor, node.Tag, node.Scalar, node.Scalar.Length, PLAIN_IMPLICIT, QUOTED_IMPLICIT, YamlScalarStyle.YAML_ANY_SCALAR_STYLE));
 			}
 
 			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YamlSequence node, IDictionary<YamlNode, string> aliases, string anchor, HashSet<YamlNode> visited)
 			{
 				const int IMPLICIT = 1;
-				GenerateEvent(pNativeEmitter, x => CreateEventSequenceStart(&x, anchor, node.Tag, IMPLICIT, YamlSequenceStyle.YAML_ANY_SEQUENCE_STYLE));
+				GenerateEvent(pNativeEmitter, x => CreateEventSequenceStart((YamlEvent*)x, anchor, node.Tag, IMPLICIT, YamlSequenceStyle.YAML_ANY_SEQUENCE_STYLE));
 				foreach (var item in node.Sequence)
 				{
 					GenerateNodeEvents(pNativeEmitter, item, aliases, visited);
 				}
-				GenerateEvent(pNativeEmitter, x => CreateEventSequenceEnd(&x));
+				GenerateEvent(pNativeEmitter, x => CreateEventSequenceEnd((YamlEvent*)x));
 			}
 
 			private static void GenerateSubTypeEvents(IntPtr pNativeEmitter, YamlMapping node, IDictionary<YamlNode, string> aliases, string anchor, HashSet<YamlNode> visited)
 			{
 				const int IMPLICIT = 1;
-				GenerateEvent(pNativeEmitter, x => CreateEventMappingStart(&x, anchor, node.Tag, IMPLICIT, YamlMappingStyle.YAML_ANY_MAPPING_STYLE));
+				GenerateEvent(pNativeEmitter, x => CreateEventMappingStart((YamlEvent*)x, anchor, node.Tag, IMPLICIT, YamlMappingStyle.YAML_ANY_MAPPING_STYLE));
 				foreach (var pair in node.Mapping)
 				{
 					GenerateNodeEvents(pNativeEmitter, pair.Key, aliases, visited);
 					GenerateNodeEvents(pNativeEmitter, pair.Value, aliases, visited);
 				}
-				GenerateEvent(pNativeEmitter, x => CreateEventMappingEnd(&x));
+				GenerateEvent(pNativeEmitter, x => CreateEventMappingEnd((YamlEvent*)x));
 			}
 
-			private static unsafe void GenerateEvent(IntPtr pNativeEmitter, Func<YamlEvent, int> eventInit)
+			private static unsafe void GenerateEvent(IntPtr pNativeEmitter, Func<IntPtr, int> eventInit)
 			{
 				var @event = new YamlEvent();
-				// this method is unsafe, so the @event struct is already fixed on the stack
-				if (0 == eventInit(@event))
+				// This method is unsafe, so the @event struct is already fixed on the stack.
+				// However, you can't pass unsafe types into lambdas so we have to cast to an IntPtr.
+				var pEvent = &@event;
+				if (0 == eventInit((IntPtr)pEvent))
 				{
 					throw new Exception("Failed to initialize YAML serialization event");
 				}
 				try
 				{
-					Emit(pNativeEmitter, &@event);
+					Emit(pNativeEmitter, pEvent);
 				}
 				finally
 				{
-					DestroyEvent(&@event);
+					DestroyEvent(pEvent);
 				}
 			}
 
