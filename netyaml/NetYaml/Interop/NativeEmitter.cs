@@ -79,10 +79,10 @@ namespace NetYaml
 				else
 				{
 					visited.Add(node);
-				}
-				foreach (var subNode in node.SubNodes)
-				{
-					FindDuplicateNodes(subNode, visited, duplicates);
+					foreach (var subNode in node.SubNodes)
+					{
+						FindDuplicateNodes(subNode, visited, duplicates);
+					}
 				}
 			}
 

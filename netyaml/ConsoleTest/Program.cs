@@ -18,13 +18,14 @@ namespace NetYaml.ConsoleTest
 
 		static void EmitTest(YDocument doc)
 		{
+			var repeatNode = new YMapping(new Dictionary<YScalar, YNode> {
+							{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
+							{"i", new YScalar("jk")}});
 			doc = doc ?? new YDocument(
 				new YMapping(new Dictionary<YScalar, YNode> {
 						{"x", new YSequence(new YScalar("a"), new YScalar("b"))},
-						{"y", new YMapping(new Dictionary<YScalar, YNode> {
-							{"f", new YSequence(new YScalar("g"), new YScalar("h"))},
-							{"i", new YScalar("jk")}
-						})}
+						{"y", repeatNode},
+						{"z", repeatNode}
 					})
 				);
 			string yaml = Yaml.Dump(doc);
