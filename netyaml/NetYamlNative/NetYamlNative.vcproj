@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\git\netyaml\yaml-0.1.4\include&quot;"
+				AdditionalIncludeDirectories="&quot;../../yaml-0.1.4/include&quot;"
 				PreprocessorDefinitions="YAML_DECLARE_STATIC"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories="&quot;C:\git\netyaml\yaml-0.1.4\win32\vs2008\Output\Debug\lib&quot;"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -89,7 +89,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -112,6 +112,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="&quot;../../yaml-0.1.4/include&quot;"
+				PreprocessorDefinitions="YAML_DECLARE_STATIC"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
